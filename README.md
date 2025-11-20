@@ -3,7 +3,6 @@ A guideline for a Love2D project that utilizes gamestates. It contains an optimi
 
 # The System
 ## 1. Gameloop
-
 ```lua
 --[[
     PROGRAMMED AS OF 11/20/2025
@@ -141,7 +140,6 @@ love.run = function()
 
 end
 ```
-
 The gameloop is a modified and more optimized version of the default ```love.run``` callback function. It cuts the if-statements that check if certain love libraries are avaliable, and defines delta time directly into the update function using ```love.timer.step```. The callback also uses local variables stored outside the gameloop to reduce access-time-complexity in the gameloop and preload section. We see this locality being mainly applied to functions provided by the Love2D library that are called every frame. These include: ```love.graphics.origin```, ```love.graphics.clear```, ```love.graphics.present```, ```love.timer.step```, ```love.timer.sleep```, ```love.event.pump```, and ```love.event.poll```. 
 
 The gamestate and its primary components are stored locally inside the callback but outside the gameloop. The components we store are its ```draw```, ```update```, ```exit```, and ```input-hashmap``` to remove an additional condition check (referring to accessing the exit function directly inside the gamestate) and reduce access-time-complexity in the gameloop. 
@@ -151,7 +149,6 @@ __ONLY STORE PROPER LOVE2D CALLBACKS CONTAINED IN__ ```love.handlers``` __INSIDE
 Inside the callback and under ```--@thread | step```, we call ```love.timer.step()``` which measures the time between two frames. __DO NOT LOAD THINGS UNDER THIS FUNCTION CALL (under__ ```--@thread | step``` __), instead put any code that is meant for preloading under the__ ```--@thread | preload``` __tag__. The time measurement will be inaccurate and will influence the ```dt```, or [```deltaTime```](https://en.wikipedia.org/wiki/Delta_timing), which can lead to unpredictable behavior from the gamestate's ```update``` function.
 
 ## 2. Gamestate
-
 ```lua
 --[[
     PROGRAMMED AS OF 11/20/2025
@@ -188,6 +185,9 @@ return {
 }
 ```
 ## Side Effects Of This System:
+- Every gamestate will abide by a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Any changes made during a gamestate's processes are persistent and require maintenance from either the ```exit``` or ```enter``` callbacks (functions 5 and 4).
+- The gamestate must be kept as a ordered list which means that it cannot have anything other than sequential numbers as keys. This is to ensure that access-time-complexity is as optimal as possible.
+- The gamestate's callback functions are not self-referential. They are intended to reference from an external scope, either global or local, which cuts an additional argument for the callbacks (the argument containing the self-reference) and removes any overhead from accessing the callback function in the gameloop by directly calling it from a local variable.
 
 ## (Optional) Side Effects Of This Template:
 ###### (NOTE: feel free to remove or keep any of these)
