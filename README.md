@@ -186,7 +186,7 @@ return {
 ```
 ## Side Effects Of This System:
 - Every gamestate will abide by a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Any changes made during a gamestate's processes are persistent and require maintenance from either the ```exit``` or ```enter``` callbacks (functions 5 and 4).
-- The gamestate must be kept as a ordered list which means that it cannot have anything other than sequential numbers as keys. This is to ensure that access-time-complexity is as optimal as possible.
+- The gamestate must be an ordered list that contains their required priority and callback functions. This means that we can only have sequential numbers as indices inside the gamestate. This is to ensure that access-time-complexity is as optimal as possible.
 - The gamestate's callback functions are not self-referential. They are intended to reference from an external scope, either global or local, which cuts an additional argument for the callbacks (the argument containing the self-reference) and removes any overhead from accessing the callback function in the gameloop by directly calling it from a local variable.
 
 ## (Optional) Side Effects Of This Template:
