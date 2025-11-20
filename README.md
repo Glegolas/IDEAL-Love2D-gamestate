@@ -225,6 +225,27 @@ The last component is the queue-processing that takes place in the gameloop. Thi
 6. Replace all appropriate callback functions and ```_ngs```'s
 7. Replace ```_gs```'s value with ```_ngs```
 8. Nil the ```_qgs``` variable
+```lua
+if _qgs then
+    -- Define our essential variables
+    local _i, _d = _qgs[1], _qgs[3] -- input, data
+    local _ngs = gamestates[_i] -- next gamestate
+
+    -- Exit from the original gamestate
+    if _exit then _exit(_d, _ngs) end
+    
+    -- Enter to the next gamestate
+    if _ngs[4] then _ngs[4](_d, _gs) end
+
+    -- Finalize our switch
+    _update = _ngs[2]
+    _draw   = _ngs[3]
+    _exit   = _ngs[5]
+    _evts   = _ngs[6] or __def_evts__
+    _gs  = _ngs
+    _qgs = nil
+end
+```
    
 ## 3. Gamestate
 ```lua
