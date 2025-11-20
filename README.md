@@ -187,8 +187,9 @@ return {
     }
 }
 ```
+## Side Effects Of This System:
 
-## (Optional) Side Effects Of My Implementation:
+## (Optional) Side Effects Of This Template:
 ###### (NOTE: feel free to remove or keep any of these)
 - The usage of an external folder to handle the initalization labelled ```source```. If you seek to change this, you must change the code under the ```--@import``` tag in the callback to fit your needs of importing the gamestates table.
 ```
