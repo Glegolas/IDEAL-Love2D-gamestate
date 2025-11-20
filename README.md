@@ -192,16 +192,38 @@ return {
 ## (Optional) Side Effects Of This Template:
 ###### (NOTE: feel free to remove or keep any of these)
 - The usage of an external folder to handle the initalization labelled ```source```. If you seek to change this, you must change the code under the ```--@import``` tag in the callback to fit your needs of importing the gamestates table.
-```
+```lua
 --@import
     local src = require("source.init")
     local gamestates = src[1]
 ```
 This code is executing the code stored inside the ```init``` file inside of the ```source``` directory which returns a table that stores every single gamestate in an ordered manner.  
+```lua
+--[[
+    INSIDE VIEW OF "source.init"
+--]]
+--@auxiliary
+    --//lua
+        local require = require
+    --\\
+--@thread | define
+    local path = "source"
+
+--@thread | run
+        
+
+--@thread | deliver
+return {
+    {
+        require("gamestates.menu"),
+        require("gamestates.game")
+    }
+}
+```
 
 As long as the gamestates variable contains a list of recognizable gamestates, the program will run just fine.
 An example of another implementation that does not use an external file to fetch gamestates is this:
-```
+```lua
 --@import
     local gamestates = {
         {3, function()end, function()end, function()end, function()end, nil}, --menu
