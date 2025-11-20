@@ -1,5 +1,5 @@
 # IDEAL-Love2D-gamestate
-A guideline for a Love2D project that utilizes gamestates. It contains an optimized [Love2D gameloop](https://love2d.org/wiki/love.run) (run function) that has less if-statements and integrates the gamestate system. 
+A guideline for a Love2D project that utilizes gamestates. It contains an optimized [Love2D gameloop](https://love2d.org/wiki/love.run) (run callback) that has less if-statements and integrates the gamestate system. 
 
 # The System
 ## 1. Gameloop
@@ -10,7 +10,7 @@ The gameloop is a modified and more optimized version of the default ```love.run
 The gamestate and its primary components are stored locally inside the callback but outside the gameloop. The components we store are its ```draw```, ```update```, ```exit```, and ```input-hashmap``` to remove an additional condition check (referring to accessing the exit function directly inside the gamestate) and reduce access-time-complexity in the gameloop. 
 The ```input-hashmap``` is utilized during the event-polling part of the gameloop where it checks if the event name is hashed to a function inside the hashmap. __Only store proper Love2D callbacks returned by ```love.event.poll()``` inside this function__.
 
-Under ```--@thread | step```, we call ```love.timer.step()``` which 
+Inside the callback and under ```--@thread | step```, we call ```love.timer.step()``` which measures the time between two frames. __Do not load things under this function call, instead put any code that is meant for preloading under the ```--@thread | preload``` tag__. If not, the time will be influenced by how long that code takes which will result in the first frame using ```deltaTime``` being inaccurate; leading to inconsistences when updating. 
 
 
 
