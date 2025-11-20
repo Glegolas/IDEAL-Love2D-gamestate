@@ -2,8 +2,7 @@
 ###### NOTE: This documentation assumes the user has some knowledge of basic programming concepts, LOVE2D, and LUA. The mentions of 'tags' and 'sub-tags' are not actual syntax of the programming language used here, but rather are used as landmarks for readibility
 A guideline for a Love2D project that utilizes gamestates. It contains an optimized [Love2D gameloop](https://love2d.org/wiki/love.run) (run callback) that has less if-statements and integrates the gamestate system. 
 
-# The System
-## 1. Gameloop
+# Gameloop
 ```lua
 --[[
     PROGRAMMED AS OF 11/20/2025
@@ -149,7 +148,7 @@ __ONLY STORE PROPER LOVE2D CALLBACKS CONTAINED IN__ ```love.handlers``` __INSIDE
 
 Inside the callback and under ```--@thread | step```, we call ```love.timer.step()``` which measures the time between two frames. __DO NOT LOAD THINGS UNDER THIS FUNCTION CALL (under__ ```--@thread | step``` __), instead put any code that is meant for preloading under the__ ```--@thread | preload``` __tag__. The time measurement will be inaccurate and will influence the ```dt```, or [```deltaTime```](https://en.wikipedia.org/wiki/Delta_timing), which can lead to unpredictable behavior from the gamestate's ```update``` function.
 
-## 2. Setting The Gamestate
+# Setting The Gamestate
 While I could've just put this under gameloop, it is important to highlight the distinctions between of the global functions ```DeferGamestate``` and ```SwitchGamestate```, and to explain the gamestate-queueing system. 
 
 We store a lot of the components mentioned here in local variables for better access-time-complexity in the gameloop.
@@ -245,7 +244,7 @@ if _qgs then
 end
 ```
    
-## 3. Gamestate
+# Gamestate
 ```lua
 --[[
     PROGRAMMED AS OF 11/20/2025
