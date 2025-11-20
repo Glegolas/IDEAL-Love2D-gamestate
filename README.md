@@ -157,7 +157,7 @@ While I could've just put this under gameloop, it is important to highlight the 
 We store a lot of the components mentioned here in local variables for better access-time-complexity in the gameloop.
 
 The gamestate-queueing system is madeup of a couple of components. The first set of components are local variables defined under the ```--@auxiliary --//define --@gamestate``` sub-tag labelled: ```_gs```, ```_qgs```, ```_draw```, ```_update```, ```_exit```, and ```_evts```. 
-- ```_gs``` is a reference to our gamestate. 
+- ```_gs``` is an indice that points to our gamestate in the gamestate list. 
 - ```_qgs``` is a reference to a queued-gamestate, which will be an ordered list that contains the three values: ```gamestate index```, ```priority```, and ```data```
   - ```gamestate index``` is the id of a gamestate stored in the gamestate list.
   - ```priority``` is a number that determines how important our gamestate is in accordance to the queue. If a priority of an incoming queued-gamestate is greater than the current queued-gamestate, it overtakes it's position in the ```_qgs``` local variable and will be choosen as the next gamestate after the current frame has passed. From a technical standpoint, our 'queued-gamestate' is not actually queued but rather buffered.
