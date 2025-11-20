@@ -154,11 +154,78 @@ Inside the callback and under ```--@thread | step```, we call ```love.timer.step
 ## 2. Setting The Gamestate
 While I could've just put this under gameloop, it is important to highlight the distinctions between of the global functions ```DeferGamestate``` and ```SwitchGamestate```, and to explain the gamestate-queueing system. 
 
-The gamestate-queueing system is madeup of a couple of components. The first set of components are defined under the  ```--@auxiliary --//define``` subtag that 
+We store a lot of the components mentioned here in local variables for better access-time-complexity in the gameloop.
 
+The gamestate-queueing system is madeup of a couple of components. The first set of components are local variables defined under the ```--@auxiliary --//define --@gamestate``` sub-tag labelled: ```_gs```, ```_qgs```, ```_draw```, ```_update```, ```_exit```, and ```_evts```. 
+- ```_gs``` is a reference to our gamestate. 
+- ```_qgs``` is a reference to a queued-gamestate, which will be an ordered list that contains the three values: ```gamestate index```, ```priority```, and ```data```
+  - ```gamestate index``` is the id of a gamestate stored in the gamestate list.
+  - ```priority``` is a number that determines how important our gamestate is in accordance to the queue. If a priority of an incoming queued-gamestate is greater than the current queued-gamestate, it overtakes it's position in the ```_qgs``` local variable and will be choosen as the next gamestate after the current frame has passed. From a technical standpoint, our 'queued-gamestate' is not actually queued but rather buffered.
+  - ```data``` is an optionally given table to a queued-gamestate that will be processed by the ```enter``` callback function if the queued-gamestate is choosen as the primary-gamestate and the ```exit``` callback function by the primary-gamestate if it's getting replaced. __AN IMPORTANT BEHAVIOR WITH THIS TABLE IS THAT IT CAN ALSO OVERRIDE THE PRIORITY STORED WITHIN A GAMESTATE THROUGH THE 'priority' KEY:__```data.priority = 0 -- any number can go here```
+- ```_draw``` is a callback function stored inside the primary-gamestate that is responsible for graphic rendering.
+- ```_update``` is a callback function stored inside the primary-gamestate that takes one argument: ```dt```, or [```deltaTime```](https://en.wikipedia.org/wiki/Delta_timing), and is responsible for handling computation and logical calculations.
+- ```_exit``` is a callback function stored inside the primary-gamestate that is responsible for firing when the gamestate is overtaken by another.
+- ```_evts``` is a hashmap that contains ```love.handlers``` callback functions for the event-processing part of the gameloop to execute upon. As mentioned before, __ONLY FUNCTIONS STORED INSIDE__ ```love.handlers``` __SHOULD BE IMPLEMENTED, AS ANY OTHER ADDITIONS WILL CAUSE UNNECESSARY MEMORY USAGE AND ACCESS-TIME-COMPLEXITY__.
+
+The other set of components are the local and global functions listed here:
 #### DeferGamestate
-- A function that 
+```lua
+-- Define priority.
+-- Our priority by default is fetched from the gamestate, but
+-- can be overloaded by a priority in our data packet.
+local _p = (data and data.priority) or gamestates[index][1]
 
+-- If there is not a queued gamestate, we don't care about comparing
+-- queue priority.
+if not _qgs then
+    _qgs = {index, _p, data}
+    return true
+end
+
+-- If there is already a queued gamestate, we will compare
+-- the priorities. (lowest & equal priority = overtake; higher priority = keep original)
+if _p >= _qgs[2] then
+    _qgs[1] = index
+    _qgs[2] = _p
+    _qgs[3] = data
+    return true
+end
+
+return false
+```
+- A function that takes an indice (a number pointing to a valid gamestate in the gamestates list) and a data table. This function will compare determine whether the gamestate or data's priority overrides the current queued-gamestate and will replace the ```_qgs``` local variable with itself.
+
+#### SwitchGamestate
+- A function that essentially does what the gameloop does when it replaces the primary-gamestate with a queued-gamestate but immediately. It takes an indice (a number pointing to a valid gamestate in the gamestates list) and a data table. It will replace ```_gs``` and fire it's respective ```_exit``` callback, if existent, with the new-gamestate, for which the function will fire it's ```_enter``` callback (at indice 4), if existent, with the old-gamestate.
+```lua
+-- Define our next gamestate
+local _ngs = gamestates[index]
+
+-- Exit from the original gamestate 
+if _exit then _exit(data, _ngs) end
+
+-- Enter from the next gamestate
+if _ngs[4] then _ngs[4](data, _gs) end
+
+-- Finalize our switch
+_update = _ngs[2]
+_draw   = _ngs[3]
+_exit   = _ngs[5]
+_evts   = _ngs[6] or __def_evts__
+_gs  = _ngs
+_qgs = nil
+```
+
+The last component is the queue-processing that takes place in the gameloop. This happens under the ```--//update``` tag and will do as follows:
+1. Check if a queued-gamestate exists.
+2. Fetch the queued-gamestates indice and data
+3. Fetch the next-gamestate and store it in the ```_ngs``` local variable through indexing the gamestate list with the queued-gamestate's stored indice.
+4. Fire the ```_exit``` callback function of the primary-gamestate with the queued-gamestates data and next-gamestate as it's arguments.
+5. Fire the ```_enter``` (indice 4) callback function with the queued-gamestates data and old-gamestate as it's arguments.
+6. Replace all appropriate callback functions and ```_ngs```'s
+7. Replace ```_gs```'s value with ```_ngs```
+8. Nil the ```_qgs``` variable
+   
 ## 3. Gamestate
 ```lua
 --[[
