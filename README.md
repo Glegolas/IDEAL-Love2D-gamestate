@@ -1,6 +1,9 @@
 # IDEAL-Love2D-gamestate
 A guideline for a Love2D project that utilizes gamestates. It contains an optimized [Love2D gameloop](https://love2d.org/wiki/love.run) (run callback) that has less if-statements and integrates the gamestate system. 
 
+###### (NOTE: This documentation assumes the user has some knowledge of basic programming concepts, LOVE2D, and LUA)
+###### (NOTE: The mentions of 'tags' and 'sub-tags' are not actual syntax of the programming language used here, but rather are reference points for people looking at my code)
+
 # The System
 ## 1. Gameloop
 ```lua
@@ -148,7 +151,15 @@ __ONLY STORE PROPER LOVE2D CALLBACKS CONTAINED IN__ ```love.handlers``` __INSIDE
 
 Inside the callback and under ```--@thread | step```, we call ```love.timer.step()``` which measures the time between two frames. __DO NOT LOAD THINGS UNDER THIS FUNCTION CALL (under__ ```--@thread | step``` __), instead put any code that is meant for preloading under the__ ```--@thread | preload``` __tag__. The time measurement will be inaccurate and will influence the ```dt```, or [```deltaTime```](https://en.wikipedia.org/wiki/Delta_timing), which can lead to unpredictable behavior from the gamestate's ```update``` function.
 
-## 2. Gamestate
+## 2. Setting The Gamestate
+While I could've just put this under gameloop, it is important to highlight the distinctions between of the global functions ```DeferGamestate``` and ```SwitchGamestate```, and to explain the gamestate-queueing system. 
+
+The gamestate-queueing system is madeup of a couple of components. The first set of components are defined under the  ```--@auxiliary --//define``` subtag that 
+
+#### DeferGamestate
+- A function that 
+
+## 3. Gamestate
 ```lua
 --[[
     PROGRAMMED AS OF 11/20/2025
