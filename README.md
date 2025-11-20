@@ -283,7 +283,7 @@ return {
 ## Side Effects Of This System:
 1. Every gamestate will abide by a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Any changes made during a gamestate's processes are persistent and require maintenance from either the ```exit``` or ```enter``` callbacks (at indexes 5 and 4 in the gamestate).
    
-2. The gamestate must be an ordered list that contains their required priority and callback functions. This means that we can only have sequential numbers as indexes inside the gamestate. This is to ensure that access-time-complexity is as optimal as possible.
+2. The gamestate must be an ordered list that contains a priority value as it's first index and the callback functions ```draw``` and ```update``` as it's callback functions (the ```event-hash``` (index 6) (index , ```enter```, (index 4) and ```exit``` (index 5) are optional callbacks). This means that we can only have sequential numbers as indexes inside the gamestate. This is to ensure that access-time-complexity is as optimal as possible.
    
 3. The gamestate's callback functions are not self-referential. They are intended to reference from an external scope, either global or local, which cuts an additional argument for the callbacks (the argument containing the self-reference) and removes any overhead from accessing the callback function in the gameloop by directly calling it from a local variable.
 
