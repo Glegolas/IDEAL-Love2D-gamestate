@@ -157,7 +157,7 @@ While I could've just put this under gameloop, it is important to highlight the 
 We store a lot of the components mentioned here in local variables for better access-time-complexity in the gameloop.
 
 The gamestate-queueing system is madeup of a couple of components. The first set of components are local variables defined under the ```--@auxiliary --//define --@gamestate``` sub-tag labelled: ```_gs```, ```_qgs```, ```_draw```, ```_update```, ```_exit```, and ```_evts```. 
-- ```_gs``` is an indice that points to our gamestate in the gamestate list. 
+- ```_gs``` is an number that points to our gamestate in the gamestate list. (the index/id of a gamestate) 
 - ```_qgs``` is a reference to a queued-gamestate, which will be an ordered list that contains the three values: ```gamestate index```, ```priority```, and ```data```
   - ```gamestate index``` is the id of a gamestate stored in the gamestate list.
   - ```priority``` is a number that determines how important our gamestate is in accordance to the queue. If a priority of an incoming queued-gamestate is greater than the current queued-gamestate, it overtakes it's position in the ```_qgs``` local variable and will be choosen as the next gamestate after the current frame has passed. From a technical standpoint, our 'queued-gamestate' is not actually queued but rather buffered.
@@ -193,10 +193,10 @@ end
 
 return false
 ```
-- A function that takes an indice (a number pointing to a valid gamestate in the gamestates list) and a data table. This function will compare determine whether the gamestate or data's priority overrides the current queued-gamestate and will replace the ```_qgs``` local variable with itself.
+- A function that takes an index (a number/id pointing to a valid gamestate in the gamestates list) and a data table. This function will compare determine whether the gamestate or data's priority overrides the current queued-gamestate and will replace the ```_qgs``` local variable with itself.
 
 #### SwitchGamestate
-- A function that essentially does what the gameloop does when it replaces the primary-gamestate with a queued-gamestate but immediately. It takes an indice (a number pointing to a valid gamestate in the gamestates list) and a data table. It will replace ```_gs``` and fire it's respective ```_exit``` callback, if existent, with the new-gamestate, for which the function will fire it's ```_enter``` callback (at indice 4), if existent, with the old-gamestate.
+- A function that essentially does what the gameloop does when it replaces the primary-gamestate with a queued-gamestate but immediately. It takes an index (a number/id pointing to a valid gamestate in the gamestates list) and a data table. It will replace ```_gs``` and fire it's respective ```_exit``` callback, if existent, with the new-gamestate, for which the function will fire it's ```_enter``` callback (at index 4 in gamestate), if existent, with the old-gamestate.
 ```lua
 -- Define our next gamestate
 local _ngs = gamestates[index]
@@ -218,10 +218,10 @@ _qgs = nil
 
 The last component is the queue-processing that takes place in the gameloop. This happens under the ```--//update``` tag and will do as follows:
 1. Check if a queued-gamestate exists.
-2. Fetch the queued-gamestates indice and data
-3. Fetch the next-gamestate and store it in the ```_ngs``` local variable through indexing the gamestate list with the queued-gamestate's stored indice.
+2. Fetch the queued-gamestates index and data
+3. Fetch the next-gamestate and store it in the ```_ngs``` local variable through indexing the gamestate list with the queued-gamestate's stored index.
 4. Fire the ```_exit``` callback function of the primary-gamestate with the queued-gamestates data and next-gamestate as it's arguments.
-5. Fire the ```_enter``` (indice 4) callback function with the queued-gamestates data and old-gamestate as it's arguments.
+5. Fire the ```_enter``` (at index 4 in gamestate) callback function with the queued-gamestates data and old-gamestate as it's arguments.
 6. Replace all appropriate callback functions and ```_ngs```'s
 7. Replace ```_gs```'s value with ```_ngs```
 8. Nil the ```_qgs``` variable
@@ -284,9 +284,11 @@ return {
 }
 ```
 ## Side Effects Of This System:
-- Every gamestate will abide by a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Any changes made during a gamestate's processes are persistent and require maintenance from either the ```exit``` or ```enter``` callbacks (functions 5 and 4).
-- The gamestate must be an ordered list that contains their required priority and callback functions. This means that we can only have sequential numbers as indices inside the gamestate. This is to ensure that access-time-complexity is as optimal as possible.
-- The gamestate's callback functions are not self-referential. They are intended to reference from an external scope, either global or local, which cuts an additional argument for the callbacks (the argument containing the self-reference) and removes any overhead from accessing the callback function in the gameloop by directly calling it from a local variable.
+1. Every gamestate will abide by a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Any changes made during a gamestate's processes are persistent and require maintenance from either the ```exit``` or ```enter``` callbacks (at indexes 5 and 4 in the gamestate).
+   
+2. The gamestate must be an ordered list that contains their required priority and callback functions. This means that we can only have sequential numbers as indexes inside the gamestate. This is to ensure that access-time-complexity is as optimal as possible.
+   
+3. The gamestate's callback functions are not self-referential. They are intended to reference from an external scope, either global or local, which cuts an additional argument for the callbacks (the argument containing the self-reference) and removes any overhead from accessing the callback function in the gameloop by directly calling it from a local variable.
 
 ## (Optional) Side Effects Of This Template:
 ###### (NOTE: feel free to remove or keep any of these)
@@ -329,6 +331,9 @@ An example of another implementation that does not use an external file to fetch
         {1, function()end, function()end, function()end, function()end, {keypressed = function(key) print(key) end}) --game
     }
 ```
+However, using this specific example would strip the gamestate of its local scope, which was originally maintained by its isolation in an external file called by ```require```. You would have to rely on global variables and the local scope of the ```love.run``` callback itself which is intended (but not strictly) made for our queue-system and calling external files. Proceed with caution.
+
 2. Using ```love.graphics.push("all")``` and ```love.graphics.pop()``` to create a new graphics stack every frame to disallow persistent graphical changes across frames. I feel fairly
 confident that this can have an impact on performance, but I do not mind this for the benefits it provides. Still, if you seek to remove this, go over to the ```--@draw``` tag listed inside the gameloop and remove the ```lg_push("all")``` and ```lg_pop()``` calls. If you do not intend to use these functions any further in the callback, I suggest removing their local variables under the ```--@auxiliary``` tag.
-3. Under the ```--@thread | preload``` tag, we call SwitchGamestate() with an argument of 1. This means that the starting gamestate is always going to be the gamestate stored in the gamelist at the position of 1. You can change this fairly easily by replacing the argument with the gamestate indice you prefer. 
+
+4. Under the ```--@thread | preload``` tag, we call SwitchGamestate() with an argument of 1. This means that the starting gamestate is always going to be the gamestate stored in the gamelist at the position of 1. You can change this fairly easily by replacing the argument with the gamestate index you prefer. 
