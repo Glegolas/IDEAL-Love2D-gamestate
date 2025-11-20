@@ -1,7 +1,7 @@
-#IDEAL-Love2D-gamestate
+# IDEAL-Love2D-gamestate
 A guideline for a Love2D project that utilizes gamestates. It contains an optimized Love2D gameloop (run function) that has less if-statements and integrates the gamestate system. 
 
-#The System
+# The System
 ## 1. Gameloop
 ##### (note: some side-effects that are not that relevant to the overall topic will be highlighted at the bottom. Please take a look at these to make sure they fit inline with your design decisions.)
 
