@@ -3,7 +3,6 @@ A guideline for a Love2D project that utilizes gamestates. It contains an optimi
 
 # The System
 ## 1. Gameloop
-##### (NOTE: some side-effects that are not relevant to the overall topic will be highlighted at the bottom of this section. Please take a look at these to make sure they fit inline with your design decisions.)
 
 ```lua
 --[[
@@ -151,8 +150,45 @@ __ONLY STORE PROPER LOVE2D CALLBACKS CONTAINED IN__ ```love.handlers``` __INSIDE
 
 Inside the callback and under ```--@thread | step```, we call ```love.timer.step()``` which measures the time between two frames. __DO NOT LOAD THINGS UNDER THIS FUNCTION CALL (under__ ```--@thread | step``` __), instead put any code that is meant for preloading under the__ ```--@thread | preload``` __tag__. The time measurement will be inaccurate and will influence the ```dt```, or [```deltaTime```](https://en.wikipedia.org/wiki/Delta_timing), which can lead to unpredictable behavior from the gamestate's ```update``` function.
 
-#### Here are some side effects of my implementation that are completely optional to keep: 
+## 2. Gamestate
 
+```lua
+--[[
+    PROGRAMMED AS OF 11/20/2025
+]]
+--@thread | runtime
+-- reserved for anything during runtime.
+
+--@thread | class
+return {
+    0, -- priority (the greater value overtakes other gamestates in queue)
+
+    --@update
+    function(dt)
+    end,
+
+    --@draw
+    function()
+    end,
+
+    --@enter (optional)
+    function()
+    end,
+
+    --@exit  (optional)
+    function()
+    end,
+
+    --@input-map (optional)
+    {
+        keypressed = function(key)
+            print("Test!")
+        end
+    }
+}
+```
+
+## Side Effects Of My Implementation (Optional To Keep Or Remove): 
 - The usage of an external folder to handle the initalization labelled ```source```. If you seek to change this, you must change the code under the ```--@import``` tag in the callback to fit your needs of importing the gamestates table.
 ```
 --@import
@@ -172,6 +208,3 @@ An example of another implementation that does not use an external file to fetch
 ```
 - Using ```love.graphics.push("all")``` and ```love.graphics.pop()``` to create a new graphics state every frame to disallow persistent graphical changes across frames. I feel fairly
 confident that this can have an impact on performance, but I do not mind this for the benefits it provides. Still, if you seek to remove this, go over to the ```--@draw``` tag listed inside the gameloop and remove the ```lg_push("all")``` and ```lg_pop()``` calls. If you do not intend to use these functions any further in the callback, I suggest removing their local variables under the ```--@auxiliary``` tag.
-
-
-
