@@ -290,7 +290,7 @@ return {
 
 ## (Optional) Side Effects Of This Template:
 ###### (NOTE: feel free to remove or keep any of these)
-- The usage of an external folder to handle the initalization labelled ```source```. If you seek to change this, you must change the code under the ```--@import``` tag in the callback to fit your needs of importing the gamestates table.
+1. The usage of an external folder to handle the initalization labelled ```source```. If you seek to change this, you must change the code under the ```--@import``` tag in the callback to fit your needs of importing the gamestates table.
 ```lua
 --@import
     local src = require("source.init")
@@ -329,6 +329,6 @@ An example of another implementation that does not use an external file to fetch
         {1, function()end, function()end, function()end, function()end, {keypressed = function(key) print(key) end}) --game
     }
 ```
-- Using ```love.graphics.push("all")``` and ```love.graphics.pop()``` to create a new graphics state every frame to disallow persistent graphical changes across frames. I feel fairly
+2. Using ```love.graphics.push("all")``` and ```love.graphics.pop()``` to create a new graphics stack every frame to disallow persistent graphical changes across frames. I feel fairly
 confident that this can have an impact on performance, but I do not mind this for the benefits it provides. Still, if you seek to remove this, go over to the ```--@draw``` tag listed inside the gameloop and remove the ```lg_push("all")``` and ```lg_pop()``` calls. If you do not intend to use these functions any further in the callback, I suggest removing their local variables under the ```--@auxiliary``` tag.
-- Under the ```--@thread | preload``` tag, we call SwitchGamestate() with an argument of 1. This means that the starting gamestate is always going to be the gamestate stored in the gamelist at the position of 1. You can change this fairly easily by replacing the argument with the gamestate indice you prefer. 
+3. Under the ```--@thread | preload``` tag, we call SwitchGamestate() with an argument of 1. This means that the starting gamestate is always going to be the gamestate stored in the gamelist at the position of 1. You can change this fairly easily by replacing the argument with the gamestate indice you prefer. 
