@@ -24,7 +24,7 @@ love.run = function()
         --\\
 
     --@thread | define
-        --//enums
+        --//defaults
             local __def_evts__  = {}
         --\\
         --//gamestate
@@ -125,5 +125,6 @@ love.run = function()
         lt_sleep(0.001)
         
     end 
+
 
 end
