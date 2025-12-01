@@ -1,5 +1,5 @@
 # IDEAL-Love2D-gamestate
-###### NOTE: This documentation assumes the user has some knowledge of basic programming concepts, LOVE2D, and LUA. The mentions of 'tags' and 'sub-tags' are not actual syntax of the programming language, but rather are used as landmarks for readibility
+###### NOTE: The mentions of 'tags' and 'sub-tags' are not actual syntax of the programming language, but rather are used as landmarks for readibility
 A guideline for a Love2D project that utilizes gamestates. It contains an optimized [Love2D gameloop](https://love2d.org/wiki/love.run) (run callback) that has less if-statements and integrates the gamestate system. 
 
 # Gameloop
